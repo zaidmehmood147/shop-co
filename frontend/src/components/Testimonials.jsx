@@ -31,7 +31,6 @@ const Testimonials = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Number of items to show based on screen size
   const getItemsToShow = () => {
     if (window.innerWidth >= 1024) return 3;
     if (window.innerWidth >= 768) return 2;
@@ -40,7 +39,6 @@ const Testimonials = () => {
 
   const [itemsToShow, setItemsToShow] = useState(getItemsToShow());
 
-  // Update itemsToShow on window resize
   React.useEffect(() => {
     const handleResize = () => {
       setItemsToShow(getItemsToShow());
@@ -100,17 +98,9 @@ const Testimonials = () => {
       </div>
 
       <div className="relative overflow-hidden">
-        <div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 transition-all duration-300 ease-in-out"
-          style={{
-            transform: `translateX(0)`,
-          }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 transition-all duration-300 ease-in-out">
           {visibleTestimonials.map((testimonial) => (
-            <div
-              key={testimonial.id}
-              className="border border-gray-200 rounded-xl p-4 md:p-6 hover:shadow-lg transition min-h-[180px] flex flex-col"
-            >
+            <div key={testimonial.id} className="border border-gray-200 rounded-xl p-4 md:p-6 hover:shadow-lg transition min-h-[180px] flex flex-col">
               <div className="flex items-center gap-0.5 mb-2">
                 {[...Array(5)].map((_, i) => (
                   <span key={i} className="text-sm md:text-base">
@@ -129,7 +119,6 @@ const Testimonials = () => {
           ))}
         </div>
 
-        {/* Dot Indicators */}
         <div className="flex justify-center gap-2 mt-6 sm:mt-8">
           {Array.from({ length: totalSlides }).map((_, index) => (
             <button

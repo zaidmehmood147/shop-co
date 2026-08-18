@@ -10,7 +10,7 @@ const ProductSection = ({ title, viewAll, filter }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/products?${filter}`);
+        const response = await axios.get(`/api/products?${filter}`);
         setProducts(response.data.products);
         setLoading(false);
       } catch (error) {

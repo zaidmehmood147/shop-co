@@ -4,14 +4,14 @@ const brands = ['VERSACE', 'ZARA', 'GUCCI', 'PRADA', 'Calvin Klein'];
 
 const BrandCarousel = () => {
   return (
-    <section className="bg-black py-6 md:py-8 overflow-hidden">
+    <section className="bg-black py-4 sm:py-6 md:py-8 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="relative overflow-hidden">
           <div className="flex animate-marquee whitespace-nowrap">
             {[...brands, ...brands].map((brand, index) => (
               <span
                 key={index}
-                className="text-white font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl px-6 sm:px-8 md:px-10"
+                className="text-white font-bold text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl px-4 sm:px-6 md:px-8 lg:px-10"
               >
                 {brand}
               </span>

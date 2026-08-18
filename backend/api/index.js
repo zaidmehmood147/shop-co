@@ -4,15 +4,16 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Paths to JSON files (relative to this file)
 const PRODUCTS_FILE = path.join(__dirname, '../data/products.json');
 const USERS_FILE = path.join(__dirname, '../data/users.json');
 
+// Helper functions
 const readProducts = () => {
   try {
     const data = fs.readFileSync(PRODUCTS_FILE, 'utf8');
@@ -31,10 +32,13 @@ const readUsers = () => {
   }
 };
 
+// ---------- API Routes ----------
+
+// Get all products (with filters)
 app.get('/api/products', (req, res) => {
   const products = readProducts();
   const { category, isNewArrival, isTopSelling, limit } = req.query;
-  
+
   let filtered = products;
   if (category) {
     filtered = filtered.filter(p => p.category.toLowerCase() === category.toLowerCase());
@@ -48,10 +52,11 @@ app.get('/api/products', (req, res) => {
   if (limit) {
     filtered = filtered.slice(0, parseInt(limit));
   }
-  
+
   res.json({ success: true, count: filtered.length, products: filtered });
 });
 
+// Get product by ID
 app.get('/api/products/:id', (req, res) => {
   const products = readProducts();
   const product = products.find(p => p.id === parseInt(req.params.id));
@@ -61,12 +66,14 @@ app.get('/api/products/:id', (req, res) => {
   res.json({ success: true, product });
 });
 
+// Get categories
 app.get('/api/categories', (req, res) => {
   const products = readProducts();
   const categories = [...new Set(products.map(p => p.category))];
   res.json({ success: true, categories });
 });
 
+// Signup
 app.post('/api/signup', async (req, res) => {
   try {
     const { email, password, name } = req.body;
@@ -74,8 +81,7 @@ app.post('/api/signup', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email and password are required' });
     }
     const users = readUsers();
-    const existingUser = users.find(u => u.email === email);
-    if (existingUser) {
+    if (users.find(u => u.email === email)) {
       return res.status(409).json({ success: false, message: 'Email already exists' });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -100,6 +106,7 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
+// Login
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -111,8 +118,8 @@ app.post('/api/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
     const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
@@ -127,4 +134,5 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Export the app for Vercel
 module.exports = app;

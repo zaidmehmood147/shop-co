@@ -12,7 +12,7 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        const response = await axios.get('/api/products');
         setProducts(response.data.products);
         setLoading(false);
       } catch (error) {
@@ -55,8 +55,6 @@ const Products = () => {
   return (
     <div>
       <Navbar />
-
-      {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4 text-sm text-gray-500">
         <Link to="/" className="hover:text-black">Home</Link>
         <span className="mx-2">›</span>
@@ -70,11 +68,7 @@ const Products = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           {products.map((product) => (
-            <Link 
-              to={`/product/${product.id}`} 
-              key={product.id} 
-              className="group cursor-pointer block"
-            >
+            <Link to={`/product/${product.id}`} key={product.id} className="group cursor-pointer block">
               <div className="bg-[#F0F0F0] rounded-lg overflow-hidden aspect-square relative">
                 <img
                   src={product.image}

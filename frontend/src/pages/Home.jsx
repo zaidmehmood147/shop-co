@@ -18,13 +18,11 @@ const Home = () => {
         title="NEW ARRIVALS" 
         viewAll={true} 
         filter="isNewArrival=true&limit=4"
-        link="/new-arrivals"
       />
       <ProductSection 
         title="TOP SELLING" 
         viewAll={true} 
         filter="isTopSelling=true&limit=4"
-        link="/top-selling"
       />
       <DressStyle />
       <Testimonials />

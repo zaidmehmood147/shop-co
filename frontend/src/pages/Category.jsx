@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Star, SlidersHorizontal, X } from 'lucide-react';
 import Navbar from '../components/Navbar';
@@ -7,12 +7,9 @@ import Footer from '../components/Footer';
 
 const Category = () => {
   const { category } = useParams();
-  const location = useLocation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
-  
-  // Filter states
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
@@ -33,27 +30,19 @@ const Category = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        let url = 'http://localhost:5000/api/products';
+        let url = '/api/products';
         const params = new URLSearchParams();
-        
         if (category && category !== 'all') {
           params.append('category', category.charAt(0).toUpperCase() + category.slice(1));
         }
-        
-        // Add price filter
         if (priceRange[0] > 0) params.append('minPrice', priceRange[0]);
         if (priceRange[1] < 1000) params.append('maxPrice', priceRange[1]);
-        
-        // Add color filter
         if (selectedColors.length > 0) {
           params.append('colors', selectedColors.join(','));
         }
-        
-        // Add size filter
         if (selectedSizes.length > 0) {
           params.append('sizes', selectedSizes.join(','));
         }
-        
         const response = await axios.get(`${url}?${params.toString()}`);
         setProducts(response.data.products);
       } catch (error) {
@@ -83,17 +72,13 @@ const Category = () => {
 
   const toggleColor = (color) => {
     setSelectedColors(prev =>
-      prev.includes(color)
-        ? prev.filter(c => c !== color)
-        : [...prev, color]
+      prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
     );
   };
 
   const toggleSize = (size) => {
     setSelectedSizes(prev =>
-      prev.includes(size)
-        ? prev.filter(s => s !== size)
-        : [...prev, size]
+      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
     );
   };
 
@@ -120,14 +105,12 @@ const Category = () => {
     <div>
       <Navbar />
 
-      {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4 text-sm text-gray-500">
         <Link to="/" className="hover:text-black">Home</Link>
         <span className="mx-2">›</span>
         <span className="text-black font-medium">{getCategoryName()}</span>
       </div>
 
-      {/* Mobile Filter Toggle */}
       <div className="container mx-auto px-4 mb-4 lg:hidden">
         <button
           onClick={() => setShowFilters(!showFilters)}
@@ -145,13 +128,11 @@ const Category = () => {
 
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Sidebar - Filters */}
           <div className={`
             lg:block lg:w-64 flex-shrink-0
             ${showFilters ? 'block' : 'hidden'}
             fixed inset-0 z-50 bg-white p-6 overflow-y-auto lg:static lg:p-0
           `}>
-            {/* Mobile close button */}
             <button
               onClick={() => setShowFilters(false)}
               className="lg:hidden absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
@@ -161,7 +142,6 @@ const Category = () => {
 
             <h3 className="text-lg font-bold mb-6">Filters</h3>
 
-            {/* Price Range */}
             <div className="mb-6">
               <h4 className="font-semibold text-sm mb-3">Price</h4>
               <div className="flex items-center gap-3">
@@ -178,7 +158,6 @@ const Category = () => {
               </div>
             </div>
 
-            {/* Colors */}
             <div className="mb-6">
               <h4 className="font-semibold text-sm mb-3">Colors</h4>
               <div className="flex flex-wrap gap-3">
@@ -190,13 +169,11 @@ const Category = () => {
                       selectedColors.includes(color) ? 'border-black ring-2 ring-black ring-offset-2' : 'border-gray-300'
                     }`}
                     style={{ backgroundColor: color }}
-                    aria-label={`Color ${color}`}
                   />
                 ))}
               </div>
             </div>
 
-            {/* Sizes */}
             <div className="mb-6">
               <h4 className="font-semibold text-sm mb-3">Size</h4>
               <div className="flex flex-wrap gap-2">
@@ -205,9 +182,7 @@ const Category = () => {
                     key={index}
                     onClick={() => toggleSize(size)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${
-                      selectedSizes.includes(size)
-                        ? 'bg-black text-white'
-                        : 'bg-gray-100 hover:bg-gray-200'
+                      selectedSizes.includes(size) ? 'bg-black text-white' : 'bg-gray-100 hover:bg-gray-200'
                     }`}
                   >
                     {size}
@@ -216,7 +191,6 @@ const Category = () => {
               </div>
             </div>
 
-            {/* Apply / Clear */}
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowFilters(false)}
@@ -233,23 +207,15 @@ const Category = () => {
             </div>
           </div>
 
-          {/* Overlay for mobile */}
           {showFilters && (
-            <div
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-              onClick={() => setShowFilters(false)}
-            />
+            <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setShowFilters(false)} />
           )}
 
-          {/* Product Grid */}
           <div className="flex-1">
-            {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold">{getCategoryName()}</h2>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Showing {products.length} Products
-                </p>
+                <p className="text-sm text-gray-500 mt-0.5">Showing {products.length} Products</p>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">Sort by:</span>
@@ -266,14 +232,10 @@ const Category = () => {
               </div>
             </div>
 
-            {/* Products */}
             {products.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500">No products found matching your filters.</p>
-                <button
-                  onClick={clearFilters}
-                  className="mt-4 text-black underline hover:no-underline"
-                >
+                <button onClick={clearFilters} className="mt-4 text-black underline hover:no-underline">
                   Clear filters
                 </button>
               </div>
@@ -294,9 +256,7 @@ const Category = () => {
                       )}
                     </div>
                     <div className="mt-2">
-                      <h3 className="font-medium text-xs sm:text-sm truncate">
-                        {product.name}
-                      </h3>
+                      <h3 className="font-medium text-xs sm:text-sm truncate">{product.name}</h3>
                       <div className="flex items-center gap-0.5 mt-0.5">
                         {renderStars(product.rating)}
                         <span className="text-[10px] text-gray-500 ml-1">{product.rating}/5</span>
@@ -304,9 +264,7 @@ const Category = () => {
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="font-bold text-sm sm:text-base">${product.price}</span>
                         {product.originalPrice && (
-                          <span className="text-gray-400 line-through text-xs">
-                            ${product.originalPrice}
-                          </span>
+                          <span className="text-gray-400 line-through text-xs">${product.originalPrice}</span>
                         )}
                       </div>
                     </div>

@@ -11,7 +11,6 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Left: Logo + Desktop Menu */}
         <div className="flex items-center gap-6 lg:gap-8">
           <button 
             className="lg:hidden" 
@@ -31,7 +30,6 @@ const Navbar = () => {
           </ul>
         </div>
 
-        {/* Search Bar */}
         <div className="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2 w-48 sm:w-64 lg:w-96">
           <Search size={18} className="text-gray-500" />
           <input
@@ -41,12 +39,8 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Right Icons */}
         <div className="flex items-center gap-3 sm:gap-4">
-          {/* Search Icon (Mobile) */}
           <Search size={20} className="md:hidden cursor-pointer" />
-          
-          {/* Cart Icon with Badge */}
           <Link to="/cart" className="relative cursor-pointer">
             <ShoppingCart size={20} />
             {cartCount > 0 && (
@@ -55,15 +49,12 @@ const Navbar = () => {
               </span>
             )}
           </Link>
-          
-          {/* User Icon - Links to Login/Signup */}
           <Link to="/login" className="cursor-pointer hover:opacity-70 transition">
             <User size={20} />
           </Link>
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-200 py-4 px-6 space-y-3 shadow-lg">
           <Link to="/products" className="block text-sm font-medium hover:text-gray-600 py-1" onClick={() => setIsMenuOpen(false)}>

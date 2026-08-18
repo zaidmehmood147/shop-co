@@ -2,26 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const styles = [
-  { 
-    name: 'Casual', 
-    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600', 
-    slug: 'casual' 
-  },
-  { 
-    name: 'Formal', 
-    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600', 
-    slug: 'formal' 
-  },
-  { 
-    name: 'Party', 
-    image: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600', 
-    slug: 'party' 
-  },
-  { 
-    name: 'Gym', 
-    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600', 
-    slug: 'gym' 
-  },
+  { name: 'Casual', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600', slug: 'casual' },
+  { name: 'Formal', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600', slug: 'formal' },
+  { name: 'Party', image: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600', slug: 'party' },
+  { name: 'Gym', image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600', slug: 'gym' },
 ];
 
 const DressStyle = () => {
@@ -33,7 +17,6 @@ const DressStyle = () => {
         </h2>
 
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          {/* Casual - spans 2 columns on desktop */}
           <Link
             to="/category/casual"
             className="relative rounded-xl overflow-hidden cursor-pointer group col-span-2 lg:col-span-2 lg:row-span-2"
@@ -45,13 +28,10 @@ const DressStyle = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4">
-              <h3 className="text-white font-bold text-lg sm:text-xl md:text-2xl">
-                Casual
-              </h3>
+              <h3 className="text-white font-bold text-lg sm:text-xl md:text-2xl">Casual</h3>
             </div>
           </Link>
 
-          {/* Formal */}
           <Link
             to="/category/formal"
             className="relative rounded-xl overflow-hidden cursor-pointer group"
@@ -63,13 +43,10 @@ const DressStyle = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4">
-              <h3 className="text-white font-bold text-lg sm:text-xl md:text-2xl">
-                Formal
-              </h3>
+              <h3 className="text-white font-bold text-lg sm:text-xl md:text-2xl">Formal</h3>
             </div>
           </Link>
 
-          {/* Party */}
           <Link
             to="/category/party"
             className="relative rounded-xl overflow-hidden cursor-pointer group"
@@ -81,13 +58,10 @@ const DressStyle = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4">
-              <h3 className="text-white font-bold text-lg sm:text-xl md:text-2xl">
-                Party
-              </h3>
+              <h3 className="text-white font-bold text-lg sm:text-xl md:text-2xl">Party</h3>
             </div>
           </Link>
 
-          {/* Gym - spans 2 columns on mobile and desktop */}
           <Link
             to="/category/gym"
             className="relative rounded-xl overflow-hidden cursor-pointer group col-span-2 lg:col-span-2"
@@ -99,9 +73,7 @@ const DressStyle = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4">
-              <h3 className="text-white font-bold text-lg sm:text-xl md:text-2xl">
-                Gym
-              </h3>
+              <h3 className="text-white font-bold text-lg sm:text-xl md:text-2xl">Gym</h3>
             </div>
           </Link>
         </div>

@@ -51,8 +51,8 @@ body {
   }
 }
 
-
-
-.animate-marquee:hover {
-  animation-play-state: paused;
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+  width: max-content;
 }
+

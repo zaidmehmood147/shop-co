@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Star, ShoppingCart, ChevronDown, ChevronUp } from 'lucide-react';
-import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -47,20 +46,20 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const response = await axios.get(`/api/products/${id}`);
         const productData = response.data.product;
         setProduct(productData);
         setSelectedColor(productData.colors?.[0] || '');
         setSelectedSize(productData.sizes?.[0] || '');
         
         const relatedRes = await axios.get(
-          `http://localhost:5000/api/products?category=${productData.category}&limit=5`
+          `/api/products?category=${productData.category}&limit=5`
         );
         let related = relatedRes.data.products.filter(p => p.id !== parseInt(id));
         if (related.length < 4) {
           const needed = 4 - related.length;
           const otherResponse = await axios.get(
-            `http://localhost:5000/api/products?limit=${needed + 1}`
+            `/api/products?limit=${needed + 1}`
           );
           const otherProducts = otherResponse.data.products.filter(
             p => p.id !== parseInt(id) && !related.some(r => r.id === p.id)
@@ -135,7 +134,6 @@ const ProductDetail = () => {
     <div>
       <Navbar />
 
-      {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4 text-sm text-gray-500">
         <Link to="/" className="hover:text-black">Home</Link>
         <span className="mx-2">›</span>
@@ -146,10 +144,8 @@ const ProductDetail = () => {
         <span className="text-black font-medium">{product.name}</span>
       </div>
 
-      {/* Product Detail */}
       <section className="container mx-auto px-4 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left - Image */}
           <div className="relative">
             <div className="bg-[#F0F0F0] rounded-2xl overflow-hidden aspect-square">
               <img
@@ -165,13 +161,11 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Right - Details */}
           <div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-integral font-bold">
               {product.name}
             </h1>
 
-            {/* Rating */}
             <div className="flex items-center gap-2 mt-2">
               <div className="flex items-center gap-0.5">
                 {renderStars(product.rating)}
@@ -181,7 +175,6 @@ const ProductDetail = () => {
               <span className="text-sm text-gray-500">{product.reviews} Reviews</span>
             </div>
 
-            {/* Price */}
             <div className="flex items-center gap-3 mt-4">
               <span className="text-3xl font-bold">${product.price}</span>
               {product.originalPrice && (
@@ -196,12 +189,10 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Description */}
             <p className="text-gray-600 text-sm mt-4 leading-relaxed">
               {product.description || 'High-quality product designed for comfort and style.'}
             </p>
 
-            {/* Colors */}
             {product.colors && product.colors.length > 0 && (
               <div className="mt-6">
                 <h3 className="font-semibold text-sm mb-2">Select Colors</h3>
@@ -220,7 +211,6 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Sizes */}
             {product.sizes && product.sizes.length > 0 && (
               <div className="mt-6">
                 <h3 className="font-semibold text-sm mb-2">Choose Size</h3>
@@ -242,7 +232,6 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Quantity & Add to Cart */}
             <div className="flex flex-col sm:flex-row gap-4 mt-6">
               <div className="flex items-center bg-gray-100 rounded-full">
                 <button
@@ -271,7 +260,6 @@ const ProductDetail = () => {
               </button>
             </div>
 
-            {/* Product Info Table */}
             <div className="mt-8 border border-gray-200 rounded-xl overflow-hidden">
               <div className="grid grid-cols-2 divide-x divide-gray-200">
                 <div className="p-3 bg-gray-50 font-medium text-sm">Material</div>
@@ -288,7 +276,6 @@ const ProductDetail = () => {
         </div>
       </section>
 
-      {/* Tabs */}
       <section className="container mx-auto px-4 py-8 sm:py-12 border-t border-gray-200">
         <div className="flex flex-wrap border-b border-gray-200 mb-6">
           <button
@@ -323,7 +310,6 @@ const ProductDetail = () => {
           </button>
         </div>
 
-        {/* Product Details Tab */}
         {activeTab === 'details' && (
           <div className="border border-gray-200 rounded-xl overflow-hidden">
             <div className="grid grid-cols-2 divide-x divide-gray-200">
@@ -339,7 +325,6 @@ const ProductDetail = () => {
           </div>
         )}
 
-        {/* Reviews Tab */}
         {activeTab === 'reviews' && (
           <div>
             <div className="flex items-center justify-between mb-4">
@@ -352,7 +337,6 @@ const ProductDetail = () => {
           </div>
         )}
 
-        {/* FAQ Tab */}
         {activeTab === 'faq' && (
           <div className="space-y-3">
             {faqs.map((faq) => (
@@ -379,7 +363,6 @@ const ProductDetail = () => {
         )}
       </section>
 
-      {/* You Might Also Like */}
       {relatedProducts.length > 0 && (
         <section className="container mx-auto px-4 py-8 sm:py-12 border-t border-gray-200">
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-integral font-bold mb-6">
