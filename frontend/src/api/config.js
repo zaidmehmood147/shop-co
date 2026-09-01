@@ -1,0 +1,1 @@
+export const API_URL = 'https://shop-co-backend-azure.vercel.app/api';
