@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Star, ShoppingCart } from 'lucide-react';
+import { API_URL } from '../api/config';
 
 const ProductSection = ({ title, viewAll, filter }) => {
   const [products, setProducts] = useState([]);
@@ -10,9 +11,7 @@ const ProductSection = ({ title, viewAll, filter }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-       import { API_URL } from '../api/config';
-
-const response = await axios.get(`${API_URL}/products?${filter}`);
+        const response = await axios.get(`${API_URL}/products?${filter}`);
         setProducts(response.data.products);
         setLoading(false);
       } catch (error) {

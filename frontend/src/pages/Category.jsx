@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Star, SlidersHorizontal, X } from 'lucide-react';
+import { API_URL } from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -30,7 +31,6 @@ const Category = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        let url = '/api/products';
         const params = new URLSearchParams();
         if (category && category !== 'all') {
           params.append('category', category.charAt(0).toUpperCase() + category.slice(1));
@@ -43,9 +43,7 @@ const Category = () => {
         if (selectedSizes.length > 0) {
           params.append('sizes', selectedSizes.join(','));
         }
-        import { API_URL } from '../api/config';
-
-const response = await axios.get(`${API_URL}/products?${params.toString()}`);
+        const response = await axios.get(`${API_URL}/products?${params.toString()}`);
         setProducts(response.data.products);
       } catch (error) {
         console.error('Error fetching products:', error);

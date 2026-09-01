@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Star, ShoppingCart } from 'lucide-react';
+import { API_URL } from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -12,9 +13,7 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-       import { API_URL } from '../api/config';
-
-const response = await axios.get(`${API_URL}/products`);
+        const response = await axios.get(`${API_URL}/products`);
         setProducts(response.data.products);
         setLoading(false);
       } catch (error) {
