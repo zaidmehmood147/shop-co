@@ -12,7 +12,9 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('/api/products');
+       import { API_URL } from '../api/config';
+
+const response = await axios.get(`${API_URL}/products`);
         setProducts(response.data.products);
         setLoading(false);
       } catch (error) {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Eye, EyeOff } from 'lucide-react';
+import { API_URL } from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -10,19 +11,25 @@ const Auth = () => {
   const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(location.pathname === '/signup');
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ fullName: '', email: '', password: '' });
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: ''
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [products, setProducts] = useState([]);
 
+  // Set active tab based on URL
   useEffect(() => {
     setIsSignUp(location.pathname === '/signup');
   }, [location.pathname]);
 
+  // Fetch featured products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('/api/products?limit=3');
+        const response = await axios.get(`${API_URL}/products?limit=3`);
         setProducts(response.data.products);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -46,7 +53,7 @@ const Auth = () => {
         ? { name: formData.fullName, email: formData.email, password: formData.password }
         : { email: formData.email, password: formData.password };
 
-      const response = await axios.post(`/api${endpoint}`, payload);
+      const response = await axios.post(`${API_URL}${endpoint}`, payload);
 
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
@@ -72,7 +79,11 @@ const Auth = () => {
     const fullStars = Math.floor(rating);
     const stars = [];
     for (let i = 0; i < 5; i++) {
-      stars.push(<span key={i} className={i < fullStars ? 'text-yellow-400' : 'text-gray-300'}>★</span>);
+      stars.push(
+        <span key={i} className={i < fullStars ? 'text-yellow-400' : 'text-gray-300'}>
+          ★
+        </span>
+      );
     }
     return stars;
   };
@@ -81,21 +92,27 @@ const Auth = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
+      {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4 text-sm text-gray-500">
         <Link to="/" className="hover:text-black">Home</Link>
         <span className="mx-2">›</span>
         <span className="text-black font-medium">{isSignUp ? 'Sign Up' : 'Sign In'}</span>
       </div>
 
+      {/* Main Content */}
       <div className="flex-1 container mx-auto px-4 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+          {/* Left Side - Form */}
           <div className="max-w-md mx-auto w-full">
             <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-8">
+              {/* Tabs */}
               <div className="flex border-b border-gray-200 mb-6">
                 <button
                   onClick={() => toggleTab('signin')}
                   className={`flex-1 pb-3 text-center font-medium text-sm transition ${
-                    !isSignUp ? 'border-b-2 border-black text-black' : 'text-gray-500 hover:text-black'
+                    !isSignUp
+                      ? 'border-b-2 border-black text-black'
+                      : 'text-gray-500 hover:text-black'
                   }`}
                 >
                   Sign In
@@ -103,28 +120,39 @@ const Auth = () => {
                 <button
                   onClick={() => toggleTab('signup')}
                   className={`flex-1 pb-3 text-center font-medium text-sm transition ${
-                    isSignUp ? 'border-b-2 border-black text-black' : 'text-gray-500 hover:text-black'
+                    isSignUp
+                      ? 'border-b-2 border-black text-black'
+                      : 'text-gray-500 hover:text-black'
                   }`}
                 >
                   Sign Up
                 </button>
               </div>
 
+              {/* Heading */}
               <h2 className="text-2xl font-integral font-bold">
                 {isSignUp ? 'Create your account' : 'Welcome back'}
               </h2>
               <p className="text-sm text-gray-500 mt-1">
-                {isSignUp ? 'Sign up and get 20% off your first order.' : 'Sign in to track orders and keep your cart.'}
+                {isSignUp
+                  ? 'Sign up and get 20% off your first order.'
+                  : 'Sign in to track orders and keep your cart.'}
               </p>
 
+              {/* Error Message */}
               {error && (
-                <div className="mt-4 bg-red-50 text-red-600 text-sm p-3 rounded-lg">{error}</div>
+                <div className="mt-4 bg-red-50 text-red-600 text-sm p-3 rounded-lg">
+                  {error}
+                </div>
               )}
 
+              {/* Form */}
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 {isSignUp && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Full name
+                    </label>
                     <input
                       type="text"
                       name="fullName"
@@ -138,7 +166,9 @@ const Auth = () => {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email address
+                  </label>
                   <input
                     type="email"
                     name="email"
@@ -151,7 +181,9 @@ const Auth = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Password (min. 6 characters)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password (min. 6 characters)
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -182,6 +214,7 @@ const Auth = () => {
                 </button>
               </form>
 
+              {/* Footer Link */}
               <p className="text-sm text-center text-gray-500 mt-6">
                 {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                 <button
@@ -194,6 +227,7 @@ const Auth = () => {
             </div>
           </div>
 
+          {/* Right Side - Product Showcase */}
           <div className="hidden lg:block">
             <div className="bg-gray-50 rounded-2xl p-6">
               <h3 className="text-sm font-medium text-gray-500 mb-4">Featured Products</h3>
@@ -202,9 +236,17 @@ const Auth = () => {
                   <p className="text-gray-400 text-sm">Loading products...</p>
                 ) : (
                   products.map((product) => (
-                    <Link to={`/product/${product.id}`} key={product.id} className="flex items-center gap-4 p-3 bg-white rounded-xl hover:shadow-md transition">
+                    <Link
+                      to={`/product/${product.id}`}
+                      key={product.id}
+                      className="flex items-center gap-4 p-3 bg-white rounded-xl hover:shadow-md transition"
+                    >
                       <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-medium truncate">{product.name}</h4>
@@ -215,7 +257,9 @@ const Auth = () => {
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-sm">${product.price}</span>
                           {product.originalPrice && (
-                            <span className="text-gray-400 line-through text-xs">${product.originalPrice}</span>
+                            <span className="text-gray-400 line-through text-xs">
+                              ${product.originalPrice}
+                            </span>
                           )}
                         </div>
                       </div>

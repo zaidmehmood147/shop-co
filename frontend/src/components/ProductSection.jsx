@@ -10,7 +10,9 @@ const ProductSection = ({ title, viewAll, filter }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`/api/products?${filter}`);
+       import { API_URL } from '../api/config';
+
+const response = await axios.get(`${API_URL}/products?${filter}`);
         setProducts(response.data.products);
         setLoading(false);
       } catch (error) {

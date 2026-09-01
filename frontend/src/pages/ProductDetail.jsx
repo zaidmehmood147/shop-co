@@ -46,15 +46,16 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`/api/products/${id}`);
+        import { API_URL } from '../api/config';
+
+const response = await axios.get(`${API_URL}/products/${id}`);
         const productData = response.data.product;
         setProduct(productData);
         setSelectedColor(productData.colors?.[0] || '');
         setSelectedSize(productData.sizes?.[0] || '');
         
-        const relatedRes = await axios.get(
-          `/api/products?category=${productData.category}&limit=5`
-        );
+        const relatedRes = await axios.get(`${API_URL}/products?category=${productData.category}&limit=5`);
+
         let related = relatedRes.data.products.filter(p => p.id !== parseInt(id));
         if (related.length < 4) {
           const needed = 4 - related.length;

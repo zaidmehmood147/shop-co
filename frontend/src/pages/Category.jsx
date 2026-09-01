@@ -43,7 +43,9 @@ const Category = () => {
         if (selectedSizes.length > 0) {
           params.append('sizes', selectedSizes.join(','));
         }
-        const response = await axios.get(`${url}?${params.toString()}`);
+        import { API_URL } from '../api/config';
+
+const response = await axios.get(`${API_URL}/products?${params.toString()}`);
         setProducts(response.data.products);
       } catch (error) {
         console.error('Error fetching products:', error);
