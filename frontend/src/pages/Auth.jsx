@@ -42,12 +42,24 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const endpoint = isSignUp ? '/signup' : '/login';
+      const endpoint = isSignUp ? '/auth/signup' : '/auth/login';
       const payload = isSignUp
         ? { name: formData.fullName, email: formData.email, password: formData.password }
         : { email: formData.email, password: formData.password };
 
       const response = await axios.post(`${API_URL}${endpoint}`, payload);
+
+ if (response.data.success) {
+  localStorage.setItem('token', response.data.token);
+  localStorage.setItem('user', JSON.stringify(response.data.user));
+  
+  if (response.data.user.role === 'admin') {
+    navigate('/admin');
+  } else {
+    navigate('/');
+  }
+  window.location.reload();
+}
 
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
@@ -141,7 +153,7 @@ const Auth = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
                   <input
-                    type="email"
+                    type="text"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
