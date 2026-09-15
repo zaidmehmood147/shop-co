@@ -36,7 +36,7 @@ const AdminAuth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+   <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-5 sm:p-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-11 h-11 sm:w-12 sm:h-12 bg-black rounded-xl flex items-center justify-center flex-shrink-0">

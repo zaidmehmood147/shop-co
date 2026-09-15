@@ -42,7 +42,7 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const endpoint = isSignUp ? '/signup' : '/login';
+      const endpoint = isSignUp ? '/auth/signup' : '/auth/login';
       const payload = isSignUp
         ? { name: formData.fullName, email: formData.email, password: formData.password }
         : { email: formData.email, password: formData.password };
@@ -78,7 +78,11 @@ const Auth = () => {
     const fullStars = Math.floor(rating);
     const stars = [];
     for (let i = 0; i < 5; i++) {
-      stars.push(<span key={i} className={i < fullStars ? 'text-yellow-400' : 'text-gray-300'}>★</span>);
+      stars.push(
+        <span key={i} className={i < fullStars ? 'text-yellow-400' : 'text-gray-300'}>
+          ★
+        </span>
+      );
     }
     return stars;
   };
@@ -126,13 +130,17 @@ const Auth = () => {
               </p>
 
               {error && (
-                <div className="mt-4 bg-red-50 text-red-600 text-sm p-3 rounded-lg">{error}</div>
+                <div className="mt-4 bg-red-50 text-red-600 text-sm p-3 rounded-lg">
+                  {error}
+                </div>
               )}
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 {isSignUp && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Full name
+                    </label>
                     <input
                       type="text"
                       name="fullName"
@@ -237,7 +245,9 @@ const Auth = () => {
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-sm">${product.price}</span>
                           {product.originalPrice > 0 && (
-                            <span className="text-gray-400 line-through text-xs">${product.originalPrice}</span>
+                            <span className="text-gray-400 line-through text-xs">
+                              ${product.originalPrice}
+                            </span>
                           )}
                         </div>
                       </div>

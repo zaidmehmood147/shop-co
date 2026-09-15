@@ -23,7 +23,7 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-[#F8F8F8]">
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 min-w-0 lg:ml-0">
         <Outlet context={{ onMenuClick: () => setSidebarOpen(true) }} />
