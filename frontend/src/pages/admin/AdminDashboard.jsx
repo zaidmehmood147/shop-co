@@ -34,6 +34,8 @@ const AdminDashboard = () => {
   const { stats, categoryCounts, recentUsers, topSellingProducts } = data;
   const maxCategory = Math.max(...categoryCounts.map(c => c.count), 1);
 
+  const barColors = ['#000000', '#2D2D2D', '#4A4A4A', '#6B6B6B', '#8C8C8C'];
+
   const StatCard = ({ title, value, icon: Icon, subtitle }) => (
     <div className="bg-black text-white rounded-2xl p-4 sm:p-6 relative overflow-hidden">
       <div className="absolute top-4 right-4 bg-white/10 backdrop-blur px-2 sm:px-3 py-1 rounded-full flex items-center gap-1">
@@ -86,7 +88,10 @@ const AdminDashboard = () => {
                     <span className="font-bold">{stats.totalUsers}</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-black" style={{ width: `${Math.min(stats.totalUsers * 10, 100)}%` }} />
+                    <div
+                      className="h-full bg-black transition-all duration-500"
+                      style={{ width: `${Math.min((stats.totalUsers / Math.max(stats.totalUsers, stats.totalProducts)) * 100, 100)}%` }}
+                    />
                   </div>
                 </div>
                 <div>
@@ -95,7 +100,10 @@ const AdminDashboard = () => {
                     <span className="font-bold">{stats.totalProducts}</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-gray-700" style={{ width: `${Math.min(stats.totalProducts * 2, 100)}%` }} />
+                    <div
+                      className="h-full bg-gray-700 transition-all duration-500"
+                      style={{ width: `${Math.min((stats.totalProducts / Math.max(stats.totalUsers, stats.totalProducts)) * 100, 100)}%` }}
+                    />
                   </div>
                 </div>
               </div>
@@ -103,19 +111,29 @@ const AdminDashboard = () => {
 
             <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <p className="text-xs font-semibold text-gray-400 uppercase">Category Volume</p>
+                <p className="text-xs font-semibold text-gray-400 uppercase">Category Volume Bar</p>
                 <p className="text-xs font-semibold text-gray-400 uppercase hidden sm:block">Distribution</p>
               </div>
-              <div className="flex items-end justify-around h-32 sm:h-48 gap-2 sm:gap-4">
-                {categoryCounts.map((cat, i) => (
-                  <div key={i} className="flex flex-col items-center gap-1 sm:gap-2 flex-1">
-                    <div
-                      className="w-full bg-black rounded-t-lg transition-all"
-                      style={{ height: `${(cat.count / maxCategory) * 100}%`, minHeight: '20px' }}
-                    />
-                    <span className="text-[10px] sm:text-xs text-gray-600 truncate w-full text-center">{cat._id}</span>
-                  </div>
-                ))}
+              <div className="flex items-end justify-around h-48 sm:h-64 gap-3 sm:gap-6">
+                {categoryCounts.map((cat, i) => {
+                  const heightPercent = maxCategory > 0 ? (cat.count / maxCategory) * 100 : 0;
+                  return (
+                    <div key={i} className="flex flex-col items-center justify-end gap-2 flex-1 h-full">
+                      <span className="text-xs sm:text-sm font-bold text-black">{cat.count}</span>
+                      <div
+                        className="w-full rounded-t-lg transition-all duration-500"
+                        style={{
+                          height: `${heightPercent}%`,
+                          minHeight: '8px',
+                          backgroundColor: barColors[i % barColors.length]
+                        }}
+                      />
+                      <span className="text-[10px] sm:text-xs text-gray-600 truncate w-full text-center mt-2">
+                        {cat._id}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -130,7 +148,10 @@ const AdminDashboard = () => {
                       <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{cat.count} products</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-black" style={{ width: `${(cat.count / maxCategory) * 100}%` }} />
+                      <div
+                        className="h-full bg-black transition-all duration-500"
+                        style={{ width: `${(cat.count / maxCategory) * 100}%` }}
+                      />
                     </div>
                   </div>
                 ))}
