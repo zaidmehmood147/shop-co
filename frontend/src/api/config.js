@@ -1,8 +1,8 @@
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'https://shop-co-backend-three.vercel.app/api/products';
 
 export const BASE_URL = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL.replace('/api', '')
-  : 'http://localhost:5000';
+  : 'https://shop-co-backend-three.vercel.app/api/products';
 
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return 'https://via.placeholder.com/300x300?text=No+Image';
