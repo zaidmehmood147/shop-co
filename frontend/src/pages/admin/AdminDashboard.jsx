@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 import { Users, Package, Star, Layers, Crown, TrendingUp } from 'lucide-react';
-import { API_URL } from '../../api/config';
+import { API_URL, getImageUrl } from '../../api/config';
 import AdminTopbar from '../../components/admin/AdminTopbar';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 
@@ -154,7 +154,14 @@ const AdminDashboard = () => {
                       {i + 1}
                     </div>
                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                      <img
+                        src={getImageUrl(p.image)}
+                        alt={p.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = 'https://via.placeholder.com/60x60?text=N/A';
+                        }}
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-xs sm:text-sm truncate">{p.name}</p>

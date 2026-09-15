@@ -41,7 +41,16 @@ const seed = async () => {
   try {
     await connectDB();
 
-    await User.deleteMany({ role: 'admin' });
+    const adminExists = await User.findOne({ email: 'admin', role: 'admin' });
+
+    if (adminExists) {
+      console.log('⏭️  Database already seeded — skipping everything to preserve your data.');
+      console.log('    (To reset everything, drop the collections in MongoDB Atlas and run this again.)');
+      process.exit(0);
+    }
+
+    console.log('🌱 First-time setup detected — seeding fresh data...\n');
+
     const hashedAdminPass = await bcrypt.hash('admin1', 10);
     await User.create({
       name: 'Administrator',
@@ -51,7 +60,6 @@ const seed = async () => {
     });
     console.log('✅ Admin user created: admin / admin1');
 
-    await User.deleteMany({ role: 'user' });
     const hashedUserPass = await bcrypt.hash('user123', 10);
     const sampleUsers = [
       { name: 'mhm.dev', email: 'hussainkadir245@gmail.com' },
@@ -61,12 +69,12 @@ const seed = async () => {
     for (const u of sampleUsers) {
       await User.create({ ...u, password: hashedUserPass, role: 'user' });
     }
-    console.log('✅ Sample users created');
+    console.log(`✅ ${sampleUsers.length} sample users created`);
 
-    await Product.deleteMany({});
     await Product.insertMany(products);
     console.log(`✅ ${products.length} products seeded`);
 
+    console.log('\n🎉 Setup complete! You can now log in with admin / admin1');
     process.exit(0);
   } catch (error) {
     console.error('Seed error:', error);

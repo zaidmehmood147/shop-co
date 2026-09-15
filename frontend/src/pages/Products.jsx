@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Star, ShoppingCart } from 'lucide-react';
-import { API_URL } from '../api/config';
+import { API_URL, getImageUrl } from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -45,9 +45,7 @@ const Products = () => {
     return (
       <div>
         <Navbar />
-        <div className="container mx-auto px-4 py-20 text-center">
-          Loading products...
-        </div>
+        <div className="container mx-auto px-4 py-20 text-center">Loading products...</div>
         <Footer />
       </div>
     );
@@ -63,18 +61,19 @@ const Products = () => {
       </div>
 
       <section className="container mx-auto px-4 py-8 sm:py-12">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-integral font-bold mb-6 sm:mb-8">
-          All Products
-        </h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8">All Products</h1>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           {products.map((product) => (
             <Link to={`/product/${product.id}`} key={product.id} className="group cursor-pointer block">
               <div className="bg-[#F0F0F0] rounded-lg overflow-hidden aspect-square relative">
                 <img
-                  src={product.image}
+                  src={getImageUrl(product.image)}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                  }}
                 />
                 {product.discount > 0 && (
                   <div className="absolute top-1 sm:top-2 left-1 sm:left-2 bg-red-500 text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full">
@@ -100,7 +99,7 @@ const Products = () => {
                   <span className="font-bold text-xs sm:text-sm md:text-base lg:text-lg">
                     ${product.price}
                   </span>
-                  {product.originalPrice && (
+                  {product.originalPrice > 0 && (
                     <span className="text-gray-400 line-through text-[8px] sm:text-[10px] md:text-sm">
                       ${product.originalPrice}
                     </span>

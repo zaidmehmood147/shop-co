@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { getImageUrl } from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const Cart = () => {
-  const { 
-    cartItems, 
-    removeFromCart, 
-    updateQuantity, 
-    getCartTotal,
+  const {
+    cartItems,
+    removeFromCart,
+    updateQuantity,
     getCartDiscount,
     getSubtotal,
     getDeliveryFee,
@@ -18,11 +18,9 @@ const Cart = () => {
   } = useCart();
 
   const [promoCode, setPromoCode] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
 
   const handleApplyPromo = () => {
     if (promoCode.toUpperCase() === 'SAVE20') {
-      setPromoApplied(true);
       alert('Promo code applied!');
     } else {
       alert('Invalid promo code');
@@ -40,8 +38,8 @@ const Cart = () => {
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold mb-2">Your Cart is Empty</h2>
             <p className="text-gray-500 text-sm sm:text-base mb-6">Looks like you haven't added any items yet.</p>
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="inline-block bg-black text-white px-8 sm:px-10 py-3 rounded-full hover:bg-gray-800 transition text-sm sm:text-base font-medium"
             >
               Continue Shopping
@@ -56,7 +54,7 @@ const Cart = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-4 text-sm text-gray-500">
         <Link to="/" className="hover:text-black">Home</Link>
         <span className="mx-2">›</span>
@@ -64,9 +62,7 @@ const Cart = () => {
       </div>
 
       <section className="flex-1 container mx-auto px-4 py-6 sm:py-8">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-integral font-bold mb-6 sm:mb-8">
-          YOUR CART
-        </h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8">YOUR CART</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           <div className="lg:col-span-2">
@@ -74,17 +70,27 @@ const Cart = () => {
               {cartItems.map((item, index) => (
                 <div key={index} className="flex gap-4 sm:gap-6 border border-gray-200 rounded-xl p-4 sm:p-6">
                   <div className="w-20 sm:w-24 h-20 sm:h-24 bg-[#F0F0F0] rounded-lg overflow-hidden flex-shrink-0">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <img
+                      src={getImageUrl(item.image)}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+                      }}
+                    />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                      <div>
+                      <div className="min-w-0">
                         <h3 className="font-medium text-sm sm:text-base truncate">{item.name}</h3>
                         <p className="text-xs sm:text-sm text-gray-500 mt-1">Size: {item.size}</p>
                         <div className="flex items-center gap-1 mt-0.5">
                           <span className="text-xs sm:text-sm text-gray-500">Color:</span>
-                          <span className="w-4 h-4 rounded-full border border-gray-300" style={{ backgroundColor: item.color }} />
+                          <span
+                            className="w-4 h-4 rounded-full border border-gray-300"
+                            style={{ backgroundColor: item.color }}
+                          />
                         </div>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3">
@@ -128,7 +134,7 @@ const Cart = () => {
           <div className="lg:col-span-1">
             <div className="border border-gray-200 rounded-xl p-4 sm:p-6 sticky top-24">
               <h3 className="font-bold text-lg mb-4">Order Summary</h3>
-              
+
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Subtotal</span>
@@ -140,7 +146,9 @@ const Cart = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Delivery Fee</span>
-                  <span className="font-medium">{getDeliveryFee() === 0 ? 'Free' : `$${getDeliveryFee().toFixed(0)}`}</span>
+                  <span className="font-medium">
+                    {getDeliveryFee() === 0 ? 'Free' : `$${getDeliveryFee().toFixed(0)}`}
+                  </span>
                 </div>
                 <div className="border-t border-gray-200 pt-3 mt-3">
                   <div className="flex justify-between text-base font-bold">
@@ -175,7 +183,9 @@ const Cart = () => {
                 Sign in to Checkout
                 <ArrowRight size={18} />
               </Link>
-              <p className="text-xs text-gray-400 text-center mt-3">Your cart will be saved to your account.</p>
+              <p className="text-xs text-gray-400 text-center mt-3">
+                Your cart will be saved to your account.
+              </p>
             </div>
           </div>
         </div>

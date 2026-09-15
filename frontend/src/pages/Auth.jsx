@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Eye, EyeOff } from 'lucide-react';
-import { API_URL } from '../api/config';
+import { API_URL, getImageUrl } from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -42,29 +42,22 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const endpoint = isSignUp ? '/auth/signup' : '/auth/login';
+      const endpoint = isSignUp ? '/signup' : '/login';
       const payload = isSignUp
         ? { name: formData.fullName, email: formData.email, password: formData.password }
         : { email: formData.email, password: formData.password };
 
       const response = await axios.post(`${API_URL}${endpoint}`, payload);
 
- if (response.data.success) {
-  localStorage.setItem('token', response.data.token);
-  localStorage.setItem('user', JSON.stringify(response.data.user));
-  
-  if (response.data.user.role === 'admin') {
-    navigate('/admin');
-  } else {
-    navigate('/');
-  }
-  window.location.reload();
-}
-
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
-        navigate('/');
+
+        if (response.data.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
         window.location.reload();
       }
     } catch (error) {
@@ -123,11 +116,13 @@ const Auth = () => {
                 </button>
               </div>
 
-              <h2 className="text-2xl font-integral font-bold">
+              <h2 className="text-2xl font-bold">
                 {isSignUp ? 'Create your account' : 'Welcome back'}
               </h2>
               <p className="text-sm text-gray-500 mt-1">
-                {isSignUp ? 'Sign up and get 20% off your first order.' : 'Sign in to track orders and keep your cart.'}
+                {isSignUp
+                  ? 'Sign up and get 20% off your first order.'
+                  : 'Sign in to track orders and keep your cart.'}
               </p>
 
               {error && (
@@ -151,20 +146,24 @@ const Auth = () => {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {isSignUp ? 'Email address' : 'Email or Username'}
+                  </label>
                   <input
                     type="text"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-black transition"
-                    placeholder="Enter your email"
+                    placeholder={isSignUp ? 'Enter your email' : 'Enter email or admin'}
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Password (min. 6 characters)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {isSignUp ? 'Password (min. 6 characters)' : 'Password'}
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -174,7 +173,6 @@ const Auth = () => {
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-black transition"
                       placeholder="Enter your password"
                       required
-                      minLength={6}
                     />
                     <button
                       type="button"
@@ -215,9 +213,20 @@ const Auth = () => {
                   <p className="text-gray-400 text-sm">Loading products...</p>
                 ) : (
                   products.map((product) => (
-                    <Link to={`/product/${product.id}`} key={product.id} className="flex items-center gap-4 p-3 bg-white rounded-xl hover:shadow-md transition">
+                    <Link
+                      to={`/product/${product.id}`}
+                      key={product.id}
+                      className="flex items-center gap-4 p-3 bg-white rounded-xl hover:shadow-md transition"
+                    >
                       <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                        <img
+                          src={getImageUrl(product.image)}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/60x60?text=N/A';
+                          }}
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-medium truncate">{product.name}</h4>
@@ -227,7 +236,7 @@ const Auth = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-sm">${product.price}</span>
-                          {product.originalPrice && (
+                          {product.originalPrice > 0 && (
                             <span className="text-gray-400 line-through text-xs">${product.originalPrice}</span>
                           )}
                         </div>

@@ -42,37 +42,58 @@ const AdminManage = () => {
     }
   };
 
-  const handleCreateProduct = async (e) => {
-    e.preventDefault();
-    setProductLoading(true);
+ const handleCreateProduct = async (e) => {
+  e.preventDefault();
+  setProductLoading(true);
 
+  try {
     const fd = new FormData();
-    Object.keys(productForm).forEach(k => fd.append(k, productForm[k]));
+    fd.append('name', productForm.name);
+    fd.append('subCategory', productForm.subCategory);
+    fd.append('category', productForm.category);
+    fd.append('gender', productForm.gender);
+    fd.append('style', productForm.style || '');
+    fd.append('dressCode', productForm.dressCode);
+    fd.append('description', productForm.description || '');
+    fd.append('price', productForm.price);
+    if (productForm.originalPrice) fd.append('originalPrice', productForm.originalPrice);
+    if (productForm.discount) fd.append('discount', productForm.discount);
+    fd.append('rating', productForm.rating || '4.5');
     fd.append('colors', productForm.color);
-    if (mainImage) fd.append('image', mainImage);
-    additionalImages.forEach(img => fd.append('additionalImages', img));
+    fd.append('isTopSelling', productForm.isTopSelling ? 'true' : 'false');
+    fd.append('isNewArrival', 'false');
 
-    try {
-      await axios.post(`${API_URL}/products`, fd, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      toast.success('Product added successfully');
-      setProductForm({
-        name: '', subCategory: 'Shirts', category: 'Casual', gender: 'Men', style: '',
-        dressCode: 'Shirts', description: '', price: '', originalPrice: '', discount: '',
-        rating: '4.5', color: '#000000', isTopSelling: false
-      });
-      setMainImage(null);
-      setAdditionalImages([]);
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to add product');
-    } finally {
-      setProductLoading(false);
+    if (mainImage) fd.append('image', mainImage);
+    if (additionalImages.length > 0) {
+      additionalImages.forEach(img => fd.append('additionalImages', img));
     }
-  };
+
+    console.log('Submitting product with:', Object.fromEntries(fd));
+
+    const res = await axios.post(`${API_URL}/products`, fd, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    console.log('Success:', res.data);
+    toast.success('Product added successfully');
+
+    setProductForm({
+      name: '', subCategory: 'Shirts', category: 'Casual', gender: 'Men', style: '',
+      dressCode: 'Shirts', description: '', price: '', originalPrice: '', discount: '',
+      rating: '4.5', color: '#000000', isTopSelling: false
+    });
+    setMainImage(null);
+    setAdditionalImages([]);
+  } catch (error) {
+    console.error('Add product error:', error.response?.data || error.message);
+    toast.error(error.response?.data?.message || 'Failed to add product');
+  } finally {
+    setProductLoading(false);
+  }
+};
 
   return (
     <div>

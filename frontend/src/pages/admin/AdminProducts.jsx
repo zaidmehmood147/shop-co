@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 import { Package, Search, Trash2, Star, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { API_URL } from '../../api/config';
+import { API_URL, getImageUrl } from '../../api/config';
 import AdminTopbar from '../../components/admin/AdminTopbar';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 
@@ -106,7 +106,14 @@ const AdminProducts = () => {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                              <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                              <img
+                                src={getImageUrl(p.image)}
+                                alt={p.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.src = 'https://via.placeholder.com/60x60?text=N/A';
+                                }}
+                              />
                             </div>
                             <div>
                               <p className="font-semibold text-sm">{p.name}</p>
@@ -154,7 +161,14 @@ const AdminProducts = () => {
                   <div key={p._id} className="p-4">
                     <div className="flex items-start gap-3">
                       <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                        <img
+                          src={getImageUrl(p.image)}
+                          alt={p.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/80x80?text=N/A';
+                          }}
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm truncate">{p.name}</p>

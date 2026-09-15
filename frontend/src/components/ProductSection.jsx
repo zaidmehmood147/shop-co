@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Star, ShoppingCart } from 'lucide-react';
-import { API_URL } from '../api/config';
+import { API_URL, getImageUrl } from '../api/config';
 
 const ProductSection = ({ title, viewAll, filter }) => {
   const [products, setProducts] = useState([]);
@@ -58,12 +58,10 @@ const ProductSection = ({ title, viewAll, filter }) => {
   return (
     <section className="container mx-auto px-4 py-6 sm:py-8 md:py-12">
       <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
-        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-integral font-bold">
-          {title}
-        </h2>
+        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">{title}</h2>
         {viewAll && (
-          <Link 
-            to="/products" 
+          <Link
+            to="/products"
             className="text-xs sm:text-sm font-medium border border-gray-300 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full hover:bg-gray-50 transition"
           >
             View All
@@ -76,9 +74,12 @@ const ProductSection = ({ title, viewAll, filter }) => {
           <Link to={`/product/${product.id}`} key={product.id} className="group cursor-pointer block">
             <div className="bg-[#F0F0F0] rounded-lg overflow-hidden aspect-square relative">
               <img
-                src={product.image}
+                src={getImageUrl(product.image)}
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                }}
               />
               {product.discount > 0 && (
                 <div className="absolute top-1 sm:top-2 left-1 sm:left-2 bg-red-500 text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full">
@@ -104,7 +105,7 @@ const ProductSection = ({ title, viewAll, filter }) => {
                 <span className="font-bold text-xs sm:text-sm md:text-base lg:text-lg">
                   ${product.price}
                 </span>
-                {product.originalPrice && (
+                {product.originalPrice > 0 && (
                   <span className="text-gray-400 line-through text-[8px] sm:text-[10px] md:text-sm">
                     ${product.originalPrice}
                   </span>

@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Star, ShoppingCart, ChevronDown, ChevronUp } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { API_URL } from '../api/config';
+import { API_URL, getImageUrl } from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -22,26 +22,10 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
 
   const faqs = [
-    {
-      id: 1,
-      question: 'What is the delivery time?',
-      answer: 'Standard delivery takes 3-5 working days. Express delivery is next day for orders placed before 4pm.'
-    },
-    {
-      id: 2,
-      question: 'Can I return this item?',
-      answer: 'Yes, we offer a 30-day return policy. Items must be unworn and in original packaging.'
-    },
-    {
-      id: 3,
-      question: 'How do I choose the right size?',
-      answer: 'Check our size guide on the product page. We also offer free exchanges if the size doesn\'t fit.'
-    },
-    {
-      id: 4,
-      question: 'What materials are used?',
-      answer: 'We use 100% organic cotton for all our products, ensuring comfort and sustainability.'
-    }
+    { id: 1, question: 'What is the delivery time?', answer: 'Standard delivery takes 3-5 working days. Express delivery is next day for orders placed before 4pm.' },
+    { id: 2, question: 'Can I return this item?', answer: 'Yes, we offer a 30-day return policy. Items must be unworn and in original packaging.' },
+    { id: 3, question: 'How do I choose the right size?', answer: 'Check our size guide on the product page. We also offer free exchanges if the size doesn\'t fit.' },
+    { id: 4, question: 'What materials are used?', answer: 'We use 100% organic cotton for all our products, ensuring comfort and sustainability.' }
   ];
 
   useEffect(() => {
@@ -52,18 +36,16 @@ const ProductDetail = () => {
         setProduct(productData);
         setSelectedColor(productData.colors?.[0] || '');
         setSelectedSize(productData.sizes?.[0] || '');
-        
+
         const relatedRes = await axios.get(
           `${API_URL}/products?category=${productData.category}&limit=5`
         );
-        let related = relatedRes.data.products.filter(p => p.id !== parseInt(id));
+        let related = relatedRes.data.products.filter(p => p.id !== id);
         if (related.length < 4) {
           const needed = 4 - related.length;
-          const otherResponse = await axios.get(
-            `${API_URL}/products?limit=${needed + 1}`
-          );
+          const otherResponse = await axios.get(`${API_URL}/products?limit=${needed + 1}`);
           const otherProducts = otherResponse.data.products.filter(
-            p => p.id !== parseInt(id) && !related.some(r => r.id === p.id)
+            p => p.id !== id && !related.some(r => r.id === p.id)
           );
           related = [...related, ...otherProducts];
         }
@@ -82,13 +64,7 @@ const ProductDetail = () => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
       stars.push(
-        <Star
-          key={i}
-          size={16}
-          fill={i < fullStars ? '#FFC633' : 'none'}
-          color={i < fullStars ? '#FFC633' : '#D1D5DB'}
-          className="inline"
-        />
+        <Star key={i} size={16} fill={i < fullStars ? '#FFC633' : 'none'} color={i < fullStars ? '#FFC633' : '#D1D5DB'} className="inline" />
       );
     }
     return stars;
@@ -100,17 +76,13 @@ const ProductDetail = () => {
     setTimeout(() => setIsAdding(false), 500);
   };
 
-  const toggleFAQ = (id) => {
-    setOpenFAQ(openFAQ === id ? null : id);
-  };
+  const toggleFAQ = (id) => setOpenFAQ(openFAQ === id ? null : id);
 
   if (loading) {
     return (
       <div>
         <Navbar />
-        <div className="container mx-auto px-4 py-20 text-center">
-          Loading product...
-        </div>
+        <div className="container mx-auto px-4 py-20 text-center">Loading product...</div>
         <Footer />
       </div>
     );
@@ -122,9 +94,7 @@ const ProductDetail = () => {
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center">
           <h2 className="text-2xl font-bold">Product not found</h2>
-          <Link to="/" className="text-blue-600 hover:underline mt-4 inline-block">
-            Back to Home
-          </Link>
+          <Link to="/" className="text-blue-600 hover:underline mt-4 inline-block">Back to Home</Link>
         </div>
         <Footer />
       </div>
@@ -150,9 +120,12 @@ const ProductDetail = () => {
           <div className="relative">
             <div className="bg-[#F0F0F0] rounded-2xl overflow-hidden aspect-square">
               <img
-                src={product.image}
+                src={getImageUrl(product.image)}
                 alt={product.name}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/600x600?text=No+Image';
+                }}
               />
             </div>
             {product.discount > 0 && (
@@ -163,14 +136,10 @@ const ProductDetail = () => {
           </div>
 
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-integral font-bold">
-              {product.name}
-            </h1>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{product.name}</h1>
 
             <div className="flex items-center gap-2 mt-2">
-              <div className="flex items-center gap-0.5">
-                {renderStars(product.rating)}
-              </div>
+              <div className="flex items-center gap-0.5">{renderStars(product.rating)}</div>
               <span className="text-sm text-gray-500">{product.rating}/5</span>
               <span className="text-sm text-gray-400">|</span>
               <span className="text-sm text-gray-500">{product.reviews} Reviews</span>
@@ -178,11 +147,9 @@ const ProductDetail = () => {
 
             <div className="flex items-center gap-3 mt-4">
               <span className="text-3xl font-bold">${product.price}</span>
-              {product.originalPrice && (
+              {product.originalPrice > 0 && (
                 <>
-                  <span className="text-gray-400 line-through text-xl">
-                    ${product.originalPrice}
-                  </span>
+                  <span className="text-gray-400 line-through text-xl">${product.originalPrice}</span>
                   <span className="bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-full">
                     -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
                   </span>
@@ -202,9 +169,7 @@ const ProductDetail = () => {
                     <button
                       key={index}
                       onClick={() => setSelectedColor(color)}
-                      className={`w-10 h-10 rounded-full border-2 transition ${
-                        selectedColor === color ? 'border-black' : 'border-gray-300'
-                      }`}
+                      className={`w-10 h-10 rounded-full border-2 transition ${selectedColor === color ? 'border-black' : 'border-gray-300'}`}
                       style={{ backgroundColor: color }}
                     />
                   ))}
@@ -220,11 +185,7 @@ const ProductDetail = () => {
                     <button
                       key={index}
                       onClick={() => setSelectedSize(size)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                        selectedSize === size
-                          ? 'bg-black text-white'
-                          : 'bg-gray-100 hover:bg-gray-200'
-                      }`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition ${selectedSize === size ? 'bg-black text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
                     >
                       {size}
                     </button>
@@ -235,26 +196,14 @@ const ProductDetail = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 mt-6">
               <div className="flex items-center bg-gray-100 rounded-full">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-4 py-3 text-lg font-bold hover:text-gray-600 transition"
-                >
-                  -
-                </button>
-                <span className="px-4 py-3 text-lg font-medium min-w-[40px] text-center">
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="px-4 py-3 text-lg font-bold hover:text-gray-600 transition"
-                >
-                  +
-                </button>
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 py-3 text-lg font-bold hover:text-gray-600 transition">-</button>
+                <span className="px-4 py-3 text-lg font-medium min-w-[40px] text-center">{quantity}</span>
+                <button onClick={() => setQuantity(quantity + 1)} className="px-4 py-3 text-lg font-bold hover:text-gray-600 transition">+</button>
               </div>
               <button
                 onClick={handleAddToCart}
                 disabled={isAdding}
-                className="flex-1 bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <ShoppingCart size={20} />
                 {isAdding ? 'Adding...' : 'Add to Cart'}
@@ -279,36 +228,9 @@ const ProductDetail = () => {
 
       <section className="container mx-auto px-4 py-8 sm:py-12 border-t border-gray-200">
         <div className="flex flex-wrap border-b border-gray-200 mb-6">
-          <button
-            onClick={() => setActiveTab('details')}
-            className={`pb-3 px-4 sm:px-6 font-medium text-sm transition ${
-              activeTab === 'details'
-                ? 'border-b-2 border-black text-black'
-                : 'text-gray-500 hover:text-black'
-            }`}
-          >
-            Product Details
-          </button>
-          <button
-            onClick={() => setActiveTab('reviews')}
-            className={`pb-3 px-4 sm:px-6 font-medium text-sm transition ${
-              activeTab === 'reviews'
-                ? 'border-b-2 border-black text-black'
-                : 'text-gray-500 hover:text-black'
-            }`}
-          >
-            Rating & Reviews
-          </button>
-          <button
-            onClick={() => setActiveTab('faq')}
-            className={`pb-3 px-4 sm:px-6 font-medium text-sm transition ${
-              activeTab === 'faq'
-                ? 'border-b-2 border-black text-black'
-                : 'text-gray-500 hover:text-black'
-            }`}
-          >
-            FAQs
-          </button>
+          <button onClick={() => setActiveTab('details')} className={`pb-3 px-4 sm:px-6 font-medium text-sm transition ${activeTab === 'details' ? 'border-b-2 border-black text-black' : 'text-gray-500 hover:text-black'}`}>Product Details</button>
+          <button onClick={() => setActiveTab('reviews')} className={`pb-3 px-4 sm:px-6 font-medium text-sm transition ${activeTab === 'reviews' ? 'border-b-2 border-black text-black' : 'text-gray-500 hover:text-black'}`}>Rating & Reviews</button>
+          <button onClick={() => setActiveTab('faq')} className={`pb-3 px-4 sm:px-6 font-medium text-sm transition ${activeTab === 'faq' ? 'border-b-2 border-black text-black' : 'text-gray-500 hover:text-black'}`}>FAQs</button>
         </div>
 
         {activeTab === 'details' && (
@@ -342,21 +264,12 @@ const ProductDetail = () => {
           <div className="space-y-3">
             {faqs.map((faq) => (
               <div key={faq.id} className="border border-gray-200 rounded-xl overflow-hidden">
-                <button
-                  onClick={() => toggleFAQ(faq.id)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition"
-                >
+                <button onClick={() => toggleFAQ(faq.id)} className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition">
                   <span className="font-medium text-sm">{faq.question}</span>
-                  {openFAQ === faq.id ? (
-                    <ChevronUp size={20} className="text-gray-500" />
-                  ) : (
-                    <ChevronDown size={20} className="text-gray-500" />
-                  )}
+                  {openFAQ === faq.id ? <ChevronUp size={20} className="text-gray-500" /> : <ChevronDown size={20} className="text-gray-500" />}
                 </button>
                 {openFAQ === faq.id && (
-                  <div className="p-4 pt-0 text-sm text-gray-600 border-t border-gray-100">
-                    {faq.answer}
-                  </div>
+                  <div className="p-4 pt-0 text-sm text-gray-600 border-t border-gray-100">{faq.answer}</div>
                 )}
               </div>
             ))}
@@ -366,22 +279,21 @@ const ProductDetail = () => {
 
       {relatedProducts.length > 0 && (
         <section className="container mx-auto px-4 py-8 sm:py-12 border-t border-gray-200">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-integral font-bold mb-6">
-            YOU MIGHT ALSO LIKE
-          </h2>
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-6">YOU MIGHT ALSO LIKE</h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {relatedProducts.slice(0, 4).map((item) => (
               <Link to={`/product/${item.id}`} key={item.id} className="group cursor-pointer">
                 <div className="bg-[#F0F0F0] rounded-lg overflow-hidden aspect-square relative">
                   <img
-                    src={item.image}
+                    src={getImageUrl(item.image)}
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                    }}
                   />
                   {item.discount > 0 && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                      -{item.discount}%
-                    </div>
+                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">-{item.discount}%</div>
                   )}
                 </div>
                 <div className="mt-2">
@@ -392,10 +304,8 @@ const ProductDetail = () => {
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="font-bold text-sm sm:text-base">${item.price}</span>
-                    {item.originalPrice && (
-                      <span className="text-gray-400 line-through text-xs sm:text-sm">
-                        ${item.originalPrice}
-                      </span>
+                    {item.originalPrice > 0 && (
+                      <span className="text-gray-400 line-through text-xs sm:text-sm">${item.originalPrice}</span>
                     )}
                   </div>
                 </div>

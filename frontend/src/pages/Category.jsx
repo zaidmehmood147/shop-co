@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Star, SlidersHorizontal, X } from 'lucide-react';
-import { API_URL } from '../api/config';
+import { API_URL, getImageUrl } from '../api/config';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -20,11 +20,8 @@ const Category = () => {
   const sizes = ['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large'];
 
   const getCategoryName = () => {
-    if (category === 'casual') return 'Casual';
-    if (category === 'formal') return 'Formal';
-    if (category === 'party') return 'Party';
-    if (category === 'gym') return 'Gym';
-    return category || 'All Products';
+    if (!category) return 'All Products';
+    return category.charAt(0).toUpperCase() + category.slice(1);
   };
 
   useEffect(() => {
@@ -35,14 +32,8 @@ const Category = () => {
         if (category && category !== 'all') {
           params.append('category', category.charAt(0).toUpperCase() + category.slice(1));
         }
-        if (priceRange[0] > 0) params.append('minPrice', priceRange[0]);
-        if (priceRange[1] < 1000) params.append('maxPrice', priceRange[1]);
-        if (selectedColors.length > 0) {
-          params.append('colors', selectedColors.join(','));
-        }
-        if (selectedSizes.length > 0) {
-          params.append('sizes', selectedSizes.join(','));
-        }
+        if (selectedColors.length > 0) params.append('colors', selectedColors.join(','));
+        if (selectedSizes.length > 0) params.append('sizes', selectedSizes.join(','));
         const response = await axios.get(`${API_URL}/products?${params.toString()}`);
         setProducts(response.data.products);
       } catch (error) {
@@ -51,51 +42,26 @@ const Category = () => {
       setLoading(false);
     };
     fetchProducts();
-  }, [category, priceRange, selectedColors, selectedSizes]);
+  }, [category, selectedColors, selectedSizes]);
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
     const stars = [];
     for (let i = 0; i < 5; i++) {
-      stars.push(
-        <Star
-          key={i}
-          size={14}
-          fill={i < fullStars ? '#FFC633' : 'none'}
-          color={i < fullStars ? '#FFC633' : '#D1D5DB'}
-          className="inline"
-        />
-      );
+      stars.push(<Star key={i} size={14} fill={i < fullStars ? '#FFC633' : 'none'} color={i < fullStars ? '#FFC633' : '#D1D5DB'} className="inline" />);
     }
     return stars;
   };
 
-  const toggleColor = (color) => {
-    setSelectedColors(prev =>
-      prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
-    );
-  };
-
-  const toggleSize = (size) => {
-    setSelectedSizes(prev =>
-      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
-    );
-  };
-
-  const clearFilters = () => {
-    setPriceRange([0, 1000]);
-    setSelectedColors([]);
-    setSelectedSizes([]);
-    setSortBy('default');
-  };
+  const toggleColor = (color) => setSelectedColors(prev => prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]);
+  const toggleSize = (size) => setSelectedSizes(prev => prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]);
+  const clearFilters = () => { setSelectedColors([]); setSelectedSizes([]); setSortBy('default'); };
 
   if (loading) {
     return (
       <div>
         <Navbar />
-        <div className="container mx-auto px-4 py-20 text-center">
-          Loading products...
-        </div>
+        <div className="container mx-auto px-4 py-20 text-center">Loading products...</div>
         <Footer />
       </div>
     );
@@ -112,64 +78,26 @@ const Category = () => {
       </div>
 
       <div className="container mx-auto px-4 mb-4 lg:hidden">
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="w-full bg-black text-white px-4 py-3 rounded-full flex items-center justify-center gap-2 text-sm font-medium"
-        >
+        <button onClick={() => setShowFilters(!showFilters)} className="w-full bg-black text-white px-4 py-3 rounded-full flex items-center justify-center gap-2 text-sm font-medium">
           <SlidersHorizontal size={18} />
           Filters
-          {(selectedColors.length > 0 || selectedSizes.length > 0) && (
-            <span className="bg-white text-black text-xs px-2 py-0.5 rounded-full">
-              {selectedColors.length + selectedSizes.length}
-            </span>
-          )}
         </button>
       </div>
 
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          <div className={`
-            lg:block lg:w-64 flex-shrink-0
-            ${showFilters ? 'block' : 'hidden'}
-            fixed inset-0 z-50 bg-white p-6 overflow-y-auto lg:static lg:p-0
-          `}>
-            <button
-              onClick={() => setShowFilters(false)}
-              className="lg:hidden absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
-            >
-              <X size={24} />
-            </button>
+          <div className={`lg:block lg:w-64 flex-shrink-0 ${showFilters ? 'block' : 'hidden'} fixed inset-0 z-50 bg-white p-6 overflow-y-auto lg:static lg:p-0`}>
+            <button onClick={() => setShowFilters(false)} className="lg:hidden absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"><X size={24} /></button>
 
             <h3 className="text-lg font-bold mb-6">Filters</h3>
-
-            <div className="mb-6">
-              <h4 className="font-semibold text-sm mb-3">Price</h4>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500">${priceRange[0]}</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="1000"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                  className="flex-1 accent-black"
-                />
-                <span className="text-sm text-gray-500">${priceRange[1]}</span>
-              </div>
-            </div>
 
             <div className="mb-6">
               <h4 className="font-semibold text-sm mb-3">Colors</h4>
               <div className="flex flex-wrap gap-3">
                 {colors.map((color, index) => (
-                  <button
-                    key={index}
-                    onClick={() => toggleColor(color)}
-                    className={`w-8 h-8 rounded-full border-2 transition ${
-                      selectedColors.includes(color) ? 'border-black ring-2 ring-black ring-offset-2' : 'border-gray-300'
-                    }`}
-                    style={{ backgroundColor: color }}
-                  />
+                  <button key={index} onClick={() => toggleColor(color)}
+                    className={`w-8 h-8 rounded-full border-2 transition ${selectedColors.includes(color) ? 'border-black ring-2 ring-black ring-offset-2' : 'border-gray-300'}`}
+                    style={{ backgroundColor: color }} />
                 ))}
               </div>
             </div>
@@ -178,13 +106,8 @@ const Category = () => {
               <h4 className="font-semibold text-sm mb-3">Size</h4>
               <div className="flex flex-wrap gap-2">
                 {sizes.map((size, index) => (
-                  <button
-                    key={index}
-                    onClick={() => toggleSize(size)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${
-                      selectedSizes.includes(size) ? 'bg-black text-white' : 'bg-gray-100 hover:bg-gray-200'
-                    }`}
-                  >
+                  <button key={index} onClick={() => toggleSize(size)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${selectedSizes.includes(size) ? 'bg-black text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
                     {size}
                   </button>
                 ))}
@@ -192,24 +115,12 @@ const Category = () => {
             </div>
 
             <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setShowFilters(false)}
-                className="flex-1 bg-black text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition"
-              >
-                Apply Filter
-              </button>
-              <button
-                onClick={clearFilters}
-                className="px-4 py-2.5 border border-gray-300 rounded-full text-sm font-medium hover:bg-gray-50 transition"
-              >
-                Clear
-              </button>
+              <button onClick={() => setShowFilters(false)} className="flex-1 bg-black text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition">Apply Filter</button>
+              <button onClick={clearFilters} className="px-4 py-2.5 border border-gray-300 rounded-full text-sm font-medium hover:bg-gray-50 transition">Clear</button>
             </div>
           </div>
 
-          {showFilters && (
-            <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setShowFilters(false)} />
-          )}
+          {showFilters && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setShowFilters(false)} />}
 
           <div className="flex-1">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
@@ -217,42 +128,28 @@ const Category = () => {
                 <h2 className="text-xl sm:text-2xl font-bold">{getCategoryName()}</h2>
                 <p className="text-sm text-gray-500 mt-0.5">Showing {products.length} Products</p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500">Sort by:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="border border-gray-300 rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-black"
-                >
-                  <option value="default">Default</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="rating">Rating</option>
-                </select>
-              </div>
             </div>
 
             {products.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-500">No products found matching your filters.</p>
-                <button onClick={clearFilters} className="mt-4 text-black underline hover:no-underline">
-                  Clear filters
-                </button>
+                <p className="text-gray-500">No products found.</p>
+                <button onClick={clearFilters} className="mt-4 text-black underline">Clear filters</button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
                 {products.map((product) => (
                   <Link to={`/product/${product.id}`} key={product.id} className="group cursor-pointer">
                     <div className="bg-[#F0F0F0] rounded-lg overflow-hidden aspect-square relative">
                       <img
-                        src={product.image}
+                        src={getImageUrl(product.image)}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        onError={(e) => {
+                          e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                        }}
                       />
                       {product.discount > 0 && (
-                        <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                          -{product.discount}%
-                        </div>
+                        <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-{product.discount}%</div>
                       )}
                     </div>
                     <div className="mt-2">
@@ -263,7 +160,7 @@ const Category = () => {
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="font-bold text-sm sm:text-base">${product.price}</span>
-                        {product.originalPrice && (
+                        {product.originalPrice > 0 && (
                           <span className="text-gray-400 line-through text-xs">${product.originalPrice}</span>
                         )}
                       </div>
