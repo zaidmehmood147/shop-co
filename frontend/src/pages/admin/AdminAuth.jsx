@@ -34,7 +34,7 @@ const AdminAuth = () => {
       setLoading(false);
     }
   };
-
+//
   return (
    <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-5 sm:p-8">
