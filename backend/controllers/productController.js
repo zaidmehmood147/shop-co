@@ -72,10 +72,6 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    console.log('📥 Create product request received');
-    console.log('Body:', req.body);
-    console.log('Files:', req.files ? req.files.map(f => f.fieldname) : 'none');
-
     const data = { ...req.body };
 
     if (!data.name || !data.name.trim()) {
@@ -97,38 +93,37 @@ const createProduct = async (req, res) => {
     data.isTopSelling = data.isTopSelling === 'true' || data.isTopSelling === true;
     data.isNewArrival = data.isNewArrival === 'true' || data.isNewArrival === true;
 
-    if (data.colors) {
-      if (typeof data.colors === 'string') {
-        data.colors = data.colors.split(',').map(c => c.trim()).filter(Boolean);
-      }
+    if (data.colors && typeof data.colors === 'string') {
+      data.colors = data.colors.split(',').map(c => c.trim()).filter(Boolean);
     }
 
-    if (data.sizes) {
-      if (typeof data.sizes === 'string') {
-        data.sizes = data.sizes.split(',').map(s => s.trim()).filter(Boolean);
-      }
-    } else {
+    if (data.sizes && typeof data.sizes === 'string') {
+      data.sizes = data.sizes.split(',').map(s => s.trim()).filter(Boolean);
+    } else if (!data.sizes) {
       data.sizes = ['S', 'M', 'L', 'XL'];
     }
 
     if (req.files && req.files.length > 0) {
       const main = req.files.find(f => f.fieldname === 'image');
+      if (main) {
+        const base64 = main.buffer.toString('base64');
+        data.image = `data:${main.mimetype};base64,${base64}`;
+      }
+
       const additional = req.files.filter(f => f.fieldname === 'additionalImages');
-      if (main) data.image = `/uploads/${main.filename}`;
       if (additional.length > 0) {
-        data.additionalImages = additional.map(f => `/uploads/${f.filename}`);
+        data.additionalImages = additional.map(f => `data:${f.mimetype};base64,${f.buffer.toString('base64')}`);
       }
     }
 
-    if (!data.image) data.image = '';
+    if (!data.image) data.image = 'https://via.placeholder.com/600x600?text=No+Image';
 
     delete data.color;
 
     const product = await Product.create(data);
-    console.log('✅ Product created:', product.name);
     res.status(201).json({ success: true, product });
   } catch (error) {
-    console.error('❌ createProduct error:', error);
+    console.error('createProduct error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -151,7 +146,10 @@ const updateProduct = async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       const main = req.files.find(f => f.fieldname === 'image');
-      if (main) data.image = `/uploads/${main.filename}`;
+      if (main) {
+        const base64 = main.buffer.toString('base64');
+        data.image = `data:${main.mimetype};base64,${base64}`;
+      }
     }
 
     delete data.color;
